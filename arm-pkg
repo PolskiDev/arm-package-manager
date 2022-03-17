@@ -1,0 +1,287 @@
+#!/bin/ruby
+
+# (arm-pkg Application File) => HelloWorld.0.1.amd64#{EXTENSION}
+
+# ** Long syntax ** #
+# arm-pkg install HelloWorld.0.1.amd64
+# arm-pkg uninstall HelloWorld.0.1.amd64
+
+
+# ~ Don't ask for confirmation ~ #
+# arm-pkg install-confirm HelloWorld.0.1.amd64
+# arm-pkg uninstall-confirm HelloWorld.0.1.amd64
+
+
+
+# ** Short syntax ** #
+# arm-pkg -i HelloWorld.0.1.amd64
+# arm-pkg -u HelloWorld.0.1.amd64
+
+# ~ Don't ask for confirmation ~ #
+# arm-pkg -ic HelloWorld.0.1.amd64
+# arm-pkg -uc HelloWorld.0.1.amd64
+
+
+
+
+# (Sources folder/directory) => HelloWorld.0.1.amd64
+# ~ Don't ask for confirmation ~ #
+
+# ** Long syntax ** #
+# arm-pkg generate-arm HelloWorld.0.1.amd64
+
+
+# ** Short syntax ** #
+# arm-pkg -gen HelloWorld.0.1.amd64
+
+
+
+
+# (DEB Application File) => helloworld_0.1_amd64.deb
+
+# ** Long syntax ** #
+# sudo alien --to-rpm helloworld_0.1_amd64.deb
+# arm-pkg install hello-world-0.1.amd64.rpm --redhat
+
+
+# ** Short syntax ** #
+# sudo alien -r helloworld_0.1_amd64.deb
+# arm-pkg install hello-world-0.1.amd64.rpm --redhat
+
+
+
+
+# (RPM Application File) => hello-world-0.1.amd64.rpm
+
+# ** Long syntax ** #
+# arm-pkg install hello-world-0.1.amd64.rpm --redhat
+# arm-pkg uninstall hello-world-0.1.amd64.rpm --redhat
+
+
+# ~ Don't ask for confirmation ~ #
+# arm-pkg install-confirm hello-world-0.1.amd64.rpm --redhat
+# arm-pkg uninstall-confirm hello-world-0.1.amd64.rpm --redhat
+
+
+
+# ** Short syntax ** #
+# arm-pkg -i hello-world-0.1.amd64.rpm --redhat
+# arm-pkg -u hello-world-0.1.amd64.rpm --redhat
+
+# ~ Don't ask for confirmation ~ #
+# arm-pkg -ic hello-world-0.1.amd64.rpm --redhat
+# arm-pkg -uc hello-world-0.1.amd64.rpm --redhat
+
+
+EXTENSION=".arm"
+TOOL="arm-pkg"
+
+if ARGV[0] == "-gen" or ARGV[0] == "generate-arm"
+    system("tar -czf #{ARGV[1]}#{EXTENSION} #{ARGV[1]}")
+
+elsif ARGV[0] == "-src" or ARGV[0] == "new-source"
+    #system("cp -Rf /bin/arm-source/HelloWorld.0.1.cli.amd64 #{ARGV[1]}")
+    system("cp -Rf /bin/arm-source/HelloWorld.0.1.opencli #{ARGV[1]}")
+
+elsif ARGV[0] == "-src-gui" or ARGV[0] == "new-gui-source"
+    system("cp -Rf /bin/arm-source/HelloWorld.0.1.universal #{ARGV[1]}")
+
+    
+elsif ARGV[0] == "-i" or ARGV[0] == "install"
+    # arm-pkg Package Manager
+    if ARGV[2] == nil
+        system("tar -xzf #{ARGV[1]}#{EXTENSION} && cd #{ARGV[1]} && sudo ./arm install")
+
+    # (Not working really well!)
+    # Debian Package Manager => RedHat Package Manager
+    elsif ARGV[2] == "--debian" or ARGV[2] == "--deb"
+        if not ARGV[1].include? ".deb"
+            # Not found (.deb) at ARGV[2]
+            system("sudo alien --to-rpm #{ARGV[1]}.deb")
+        else
+            # Found (.deb) at ARGV[2]
+            system("sudo alien --to-rpm #{ARGV[1]}")
+        end
+
+        print("Use:   sudo alien -i <package>.rpm     to install the converted DEB package file!")
+    
+    # RedHat Package Manager => Linux Kernel
+    elsif ARGV[2] == "--redhat" or ARGV[2] == "--rpm"
+        if not ARGV[1].include? ".rpm"
+            # Not found (.rpm) at ARGV[2]
+            system("sudo dnf install ./#{ARGV[1]}.rpm")
+        else
+            # Found (.rpm) at ARGV[2]
+            system("sudo dnf install ./#{ARGV[1]}")
+        end
+    end
+
+elsif ARGV[0] == "-u" or ARGV[0] == "uninstall" or ARGV[1] == "remove"
+
+    # arm-pkg Package Manager
+    if ARGV[2] == nil 
+        system("tar -xzf #{ARGV[1]}#{EXTENSION} && cd #{ARGV[1]} && sudo ./arm uninstall")
+
+    #RedHat Package Manager => Linux Kernel
+    elsif ARGV[2] == "--redhat" or ARGV[2] == "--rpm"
+        if not ARGV[1].include? ".rpm"
+            # Not found (.rpm) at ARGV[2]
+            system("sudo dnf remove ./#{ARGV[1]}.rpm")
+        else
+            # Found (.rpm) at ARGV[2]
+            system("sudo dnf remove ./#{ARGV[1]}")
+        end
+    
+    end
+
+elsif ARGV[0] == "-ic" or ARGV[0] == "install-confirm"
+    if ARGV[2] == nil
+        system("tar -xzf #{ARGV[2]}#{EXTENSION} && cd #{ARGV[2]} && sudo ./arm install-confirm")
+    
+    elsif ARGV[2] == "--redhat" or ARGV[2] == "--rpm"
+        if not ARGV[1].include? ".rpm"
+            # Not found (.rpm) at ARGV[2]
+            system("sudo dnf install ./#{ARGV[1]}.rpm -y")
+        else
+            # Found (.rpm) at ARGV[2]
+            system("sudo dnf install ./#{ARGV[1]} -y")
+        end
+    
+    end
+
+elsif ARGV[0] == "-uc" or ARGV[0] == "uninstall-confirm"
+    if ARGV[2] == nil
+        system("tar -xzf #{ARGV[2]}#{EXTENSION} && cd #{ARGV[2]} && sudo ./arm uninstall-confirm")
+    
+    elsif ARGV[2] == "--redhat" or ARGV[2] == "--rpm"
+        if not ARGV[1].include? ".rpm"
+            # Not found (.rpm) at ARGV[2]
+            system("sudo dnf remove ./#{ARGV[2]}.rpm -y")
+        else
+            # Found (.rpm) at ARGV[2]
+            system("sudo dnf remove ./#{ARGV[2]} -y")
+
+        end
+    
+    end
+
+else#if ARGV[0] == "help"
+    # Help
+	puts("---------------------------------------------------------\n\n")
+
+    puts("**Manual page (Manpage)**")
+    puts("#{TOOL} help\n\n")
+
+    puts("**References**")
+    puts("<package> => HelloWorld.1.0.amd64\n\n")
+    
+    puts("---------------------------------------------------------\n\n")
+
+    puts("**Long syntax**\n\n")
+
+    puts(" ~ Convert from DEB to RPM ~")
+    puts("sudo alien --to-rpm <package>.deb\n\n")
+    
+    puts(" ~ Install and Uninstall packages (RedHat) ~")
+    puts("#{TOOL} install <package> --redhat")
+    puts("#{TOOL} uninstall <package> --redhat\n\n")
+    
+    puts(" ~ Don't ask for confirmation (RedHat) ~")
+    puts("#{TOOL} install-confirm <package> --redhat")
+    puts("#{TOOL} uninstall-confirm <package> --redhat\n\n")
+    
+    puts(" ~ Install and Uninstall packages (#{TOOL}) ~")
+    puts("#{TOOL} install <package>")
+    puts("#{TOOL} uninstall <package>\n\n")
+    
+    puts(" ~ Don't ask for confirmation (#{TOOL}) ~ ")
+    puts("#{TOOL} install-confirm <package>")
+    puts("#{TOOL} uninstall-confirm <package>\n\n")
+    
+    puts(" ~ Compress [#{EXTENSION}] package (#{TOOL}) ~")
+    puts("#{TOOL} generate-arm <package>\n\n")
+
+    puts(" ~ Generate new [#{EXTENSION}] source package (#{TOOL}) ~ ")
+    puts("#{TOOL} new-source <package_name>")
+    puts("#{TOOL} new-gui-source <package_name>\n\n")
+
+    puts("---------------------------------------------------------\n\n")
+
+    puts("**Short syntax**")
+    puts(" ~ Convert from DEB to RPM ~ ")
+    puts("sudo alien -r <package>.deb\n\n")
+
+    puts(" ~ Install and Uninstall packages (RedHat) ~ ")
+    puts("#{TOOL} -i <package> --redhat")
+    puts("#{TOOL} -u <package> --redhat\n\n")
+    
+    puts(" ~ Don't ask for confirmation (RedHat) ~ ")
+    puts("#{TOOL} -ic <package> --redhat")
+    puts("#{TOOL} -uc <package> --redhat\n\n")
+
+    puts(" ~ Install and Uninstall packages (#{TOOL}) ~ ")
+    puts("#{TOOL} -i <package>")
+    puts("#{TOOL} -u <package>\n\n")
+    
+    puts(" ~ Don't ask for confirmation (#{TOOL}) ~ ")
+    puts("#{TOOL} -ic <package>")
+    puts("#{TOOL} -uc <package>\n\n\n")
+    
+
+    puts(" ~ Compress [#{EXTENSION}] package (#{TOOL}) ~ ")
+    puts("#{TOOL} -gen <package>\n\n")
+
+    puts(" ~ Generate new [#{EXTENSION}] source package (#{TOOL}) ~ ")
+    puts("#{TOOL} -src <package_name>")
+    puts("#{TOOL} -src-gui <package_name>\n\n")
+    
+
+    puts("---------------------------------------------------------\n\n")
+    
+
+    puts("**Examples**")
+    puts("HelloWorld.1.0.amd64 => folder")
+    puts("HelloWorld.1.0.amd64#{EXTENSION} => #{TOOL} package file\n\n")
+    
+
+    puts("**Short syntax**")
+    puts("#{TOOL} -i HelloWorld.1.0.amd64")
+    puts("#{TOOL} -u HelloWorld.0.1.amd64\n")
+    
+    puts("#{TOOL} -ic HelloWorld.1.0.amd64")
+    puts("#{TOOL} -uc HelloWorld.0.1.amd64\n")
+    
+    puts("#{TOOL} -gen HelloWorld.0.1.amd64")
+    puts("#{TOOL} -src HelloWorld.0.1.amd64\n\n")
+    
+
+    puts("**Long syntax**")
+    puts("#{TOOL} install HelloWorld.1.0.amd64")
+    puts("#{TOOL} uninstall HelloWorld.0.1.amd64\n")
+    
+    puts("#{TOOL} install-confirm HelloWorld.1.0.amd64")
+    puts("#{TOOL} uninstall-confirm HelloWorld.0.1.amd64\n")
+    
+    puts("#{TOOL} generate-arm HelloWorld.0.1.amd64")
+    puts("#{TOOL} new-source HelloWorld.0.1.amd64\n\n\n")
+
+
+    puts("**RedHat Package Manager - Long syntax**")
+    puts("#{TOOL} install hello-world-0.1.amd64.rpm --redhat")
+    puts("#{TOOL} uninstall hello-world-0.1.amd64.rpm --redhat\n")
+    
+    puts("#{TOOL} install-confirm hello-world-0.1.amd64.rpm --redhat")
+    puts("#{TOOL} uninstall-confirm hello-world-0.1.amd64.rpm --redhat\n\n\n")
+    
+    
+
+    puts("**RedHat Package Manager - Short syntax**")
+    puts("#{TOOL} -i hello-world-0.1.amd64.rpm --redhat")
+    puts("#{TOOL} -u hello-world-0.1.amd64.rpm --redhat\n")
+    
+    puts("#{TOOL} -ic hello-world-0.1.amd64.rpm --redhat")
+    puts("#{TOOL} -uc hello-world-0.1.amd64.rpm --redhat\n\n\n")
+
+
+    puts("---------------------------------------------------------\n\n\n")
+end
