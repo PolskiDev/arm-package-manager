@@ -6,7 +6,7 @@ however all linux distros are supported by doing the installation with the Makef
 **_make remove_**  
 **_make_**  
 
-Tested on: Fedora Linux 35 - x86_64 (amd64)
+Tested on: Fedora Linux 35 - Arch: x86_64 (amd64)  
 
-Gabriel Margarido
-January 23rd 2022
+Gabriel Margarido  
+January 23rd 2022  
